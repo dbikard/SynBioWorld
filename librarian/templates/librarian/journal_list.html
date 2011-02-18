@@ -1,0 +1,24 @@
+{% extends  'librarian/base.html' %}
+{% block title %}Journal listing{% endblock %}
+
+{% block content %}
+<h1>Journal listing <span style="font-size:12px">({{ total }})</span></h1>
+
+{{ description }}
+<ul>
+  {% for journal in object_list %}
+    <li>
+      <a href="{% url librarian.views.show_journal key=journal.pk %}">{{ journal.name}}</a>
+    </li>
+  {% endfor %}
+</ul>
+
+<div>
+  {% if has_previous %}
+    <a href="{% url librarian.views.list_journal %}?page={{ previous }}">&lt;-previous</a>
+  {% endif %}
+  {% if has_next %}
+    <a href="{% url librarian.views.list_journal %}?page={{ next }}">next-&gt;</a>
+  {% endif %}
+</div>
+{% endblock %}

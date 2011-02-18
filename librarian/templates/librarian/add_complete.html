@@ -1,0 +1,19 @@
+{% extends 'librarian/base.html' %}
+{% block title %}Librarian{% endblock %}
+
+
+{% block content %}
+<h2>{{ new_papers.number }} new papers<br></h2>
+<ul>
+{% for paper in new_papers %}
+	<li> {{paper.title}} </li>
+{% endfor %}
+</ul>
+
+<h2>{{ already_in_DB.number }} already in DB<br></h2>
+<ul>
+{% for paper in already_in_DB %}
+	<li> {{paper.title}} </li>
+{% endfor %}
+</ul>
+{% endblock %}

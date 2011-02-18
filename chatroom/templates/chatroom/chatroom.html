@@ -1,0 +1,39 @@
+{% extends  'base.html' %}
+{% block title %}Chat Room{% endblock %}
+
+{% load media %}
+{% block extra-head %}
+<script src="/_ah/channel/jsapi"></script>
+{% include_media 'mainjs.js' %}
+<style type="text/css">
+		#textarea {width: 100%;}
+		#msg { position: relative; 
+			height: 300px; 
+			word-wrap: break-word; 
+			word-break: break-all; 
+			border: 1px solid grey;
+			overflow-y:auto;
+		}
+		.top1em { margin-top: 1em; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div id="msg">{{ text|safe }}</div>
+
+<div id="input">
+	<div>
+	<textarea id="textarea" rows="2" onfocus="inputOnFocus()">Enter your message</textarea>
+	</div>
+	<div class="top1em">
+	{% if user.is_authenticated %}
+	{% else %}
+	<a href="{% url django.contrib.auth.views.login %}?next={{ request.path }}">login</a>
+	{% endif %}
+	</div>
+</div>
+
+{% endblock %}
+
+

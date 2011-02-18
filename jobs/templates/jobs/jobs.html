@@ -1,0 +1,16 @@
+{% extends  'base.html' %}
+{% block title %}Jobs{% endblock %}
+
+{% block content %}
+
+<ul>
+{% for entry in items.entries %}
+	<li><a href="{{ entry.link }}">{{ entry.title }}</a>
+	{{ entry.summary|safe}}
+	</li>
+	
+{% endfor %}
+</ul>
+{% endblock %}
+
+

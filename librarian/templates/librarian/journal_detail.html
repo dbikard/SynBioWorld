@@ -1,0 +1,17 @@
+{% extends  'librarian/base.html' %}
+{% block title %}{{ object.name }}{% endblock %}
+
+{% block content %}
+<a href="{% url librarian.views.list_journal %}">Back to listing</a>
+<h1>{{ object.name }}</h1>
+
+<ul>
+  {% for paper in object.get_papers %}
+    <li>
+      <a href="{% url librarian.views.show_paper paper_id=paper.pk %}">{{ paper.title}}</a>  {{paper.pubYear}} <br>
+      {% for author in paper.get_authors %} 
+	<a style="color:grey" href="{% url librarian.views.show_person person_id=author.pk %}">{{author.initials}} {{author.last_name}}</a>,{% endfor %} 
+    </li>
+	{% endfor %}
+</ul>
+{% endblock %}

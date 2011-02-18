@@ -1,0 +1,28 @@
+[
+  {
+    "model": "minicms.page",
+    "pk": 27,
+    "fields": {
+      "title": "None of us is as smart as all of us",
+      "content": "We are a group of synthetic biology students who strongly believe in the power of the web of data and of new communication technologies. We want to empower our research field with these new technologies to help people meet, share experiences, cooperate and in the end advance science.\r\n",
+      "pre_rendered_content": "<div class=\"document\">\n<p>We are a group of synthetic biology students who strongly believe in the power of the web of data and of new communication technologies. We want to empower our research field with these new technologies to helppeople meet, share experiences, cooperate and in the end advance science.</p>\n</div>\n",
+      "url": "/about"
+    }
+  },
+  {
+    "model": "minicms.block",
+    "pk": 20,
+    "fields": {
+      "name": "menu",
+      "content": "Home     /\r\nBlog    /blog/synbioblog\r\nChatroom    /chatroom\r\nAbout    /about"
+    }
+   },
+  {
+    "model": "minicms.block",
+    "pk": 23,
+    "fields": {
+      "name": "sidebar",
+      "content": "<script src=\"http://widgets.twimg.com/j/2/widget.js\"></script>\r\n<script>\r\nnew TWTR.Widget({\r\n  version: 2,\r\n  type: \"profile\",\r\n  rpp: 4,\r\n  interval: 6000,\r\n  width: 250,\r\n  height: 300,\r\n  theme: {\r\n    shell: {\r\n      background: \"#333333\",\r\n      color: \"#ffffff\"\r\n    },\r\n    tweets: {\r\n      background: \"#ffffff\",\r\n      color: \"#000000\",\r\n      links: \"#4e962e\"\r\n    }\r\n  },\r\n  features: {\r\n    scrollbar: false,\r\n    loop: false,\r\n    live: false,\r\n    hashtags: true,\r\n    timestamp: true,\r\n    avatars: false,\r\n    behavior: \"all\"\r\n  }\r\n}).render().setUser(\"synbionews\").start();\r\n</script>"
+    }
+  }
+]

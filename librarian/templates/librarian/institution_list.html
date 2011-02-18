@@ -1,0 +1,23 @@
+{% extends  'librarian/base.html' %}
+{% block title %}Institution listing{% endblock %}
+
+{% block content %}
+<h1>Institution listing <span style="font-size:12px">({{ total }})</span></h1>
+{{ description }}
+<ul>
+  {% for object in object_list %}
+    <li>
+      <a href="{% url librarian.views.show_institution key=object.pk %}">{{ object.name}}</a> 
+    </li>
+  {% endfor %}
+</ul>
+
+<div>
+  {% if has_previous %}
+    <a href="{% url librarian.views.list_institution %}?page={{ previous }}">&lt;-previous</a>
+  {% endif %}
+  {% if has_next %}
+    <a href="{% url librarian.views.list_institution %}?page={{ next }}">next-&gt;</a>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends  'librarian/base.html' %}
+{% block title %}{{ object.first_name }} {{ object.last_name }}{% endblock %}
+
+{% block content %}
+
+
+<h1>{{ object.first_name }} {{ object.last_name }}</h1> 
+<h2> SBW score:   {{ object.sbw }}</h2>
+
+
+<a href="{% url librarian.views.list_people %}">Back to listing</a>
+<ul>
+  <li>Institution:  <a href="{% url librarian.views.show_institution key=object.get_institution.pk %}">{{ object.get_institution.name}}</a></li>
+  
+  <li>SB papers: 
+	<ul>{% for paper in object.get_papers %}
+		<li><a href="{% url librarian.views.show_paper paper_id=paper.pk %}">{{ paper.title }}</a>
+		 <a style="color:magenta" href="{% url librarian.views.show_journal key=paper.journal.pk %}">{{paper.journal.short_name}}</a>  
+                     {{paper.pubYear}} <br>
+		{% for author in paper.get_authors %} 
+		<a style="color:grey" href="{% url librarian.views.show_person person_id=author.pk %}">{{author.initials}} {{author.last_name}}</a>,{% endfor %} 
+		
+		</li>
+		{% endfor %}
+	</ul>
+  </li>
+</ul>
+{% endblock %}
+

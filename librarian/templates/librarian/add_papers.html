@@ -1,0 +1,12 @@
+{% extends 'librarian/base.html' %}
+{% block title %}Librarian{% endblock %}
+
+
+{% block content %}
+<h1>Copy/Paste ISI data</h1>
+
+<form action="/librarian/add/" method="post">
+{{ form.as_p }}
+<input type="submit" value="Submit" />
+
+{% endblock %}

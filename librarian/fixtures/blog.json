@@ -1,0 +1,28 @@
+[
+  {
+    "model": "blog.blog",
+    "pk": 238001,
+    "fields": {
+      "title": "SynBioBlog",
+      "base_url": "synbioblog",
+      "description": "",
+      "feed_redirect_url": ""
+    }
+  },
+  {
+    "model": "blog.post",
+    "pk": 16,
+    "fields": {
+      "title": "Hello World",
+      "content": "Due to a lack in flexibility, we decided to shut down our previous platform which was based on vbulletin. So here is our brand new website hosted on the google appengine and based on the django framework. Everything is under construction, but we'll be glad to have your feedback already so that we can construct things as you like them. Anyone willing to give us a hand is more than welcome too!",
+      "pre_rendered_content": "<div class=\"document\">\n<p>Due to a lack in flexibility, we decided to shut down our previous platform which was based on vbulletin. So here is our brand newwebsite hosted on the google appengine and based on the django framework. Everything is under construction, but we&quotll be glad to have your feedback already sothat we can construct things as you like them. Anyone willing to give us a handis more than welcome too!</p>\n</div>\n",
+      "url": "Hello-World",
+      "blog": 238001,
+      "published": true,
+      "author": 199001,
+      "published_on": null,
+      "last_update": null,
+      "review_key": "qBtF6VNf85C5p47iflAkQCWSaCPA6RJR"
+    }
+   }
+]
