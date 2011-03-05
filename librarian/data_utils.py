@@ -9,6 +9,7 @@ def update_SBW():
 		 entities=c.objects.all()
 		 for e in entities:
 			 e.get_SBW()
+			 print e, e.sbw
 
 def cleanUnivName(univName):
         if "ETH" in univName:
@@ -126,8 +127,8 @@ def get_cited_paper(cit):
 def parse_ISI_data(data):
 	months={"jan":1,"feb":2,"mar":3,"apr":4,"may":5,"jun":6,"jul":7,"aug":8,"sep":9,"oct":10,"nov":11,"dec":12}
 
-	AU,SO,TI, PD, VL, AB, DI, CR, PY, C1, EM = data
 
+	PT,AU,BA,ED,GP,AF,CA,TI,SO,SE,LA,DT,CT,CY,CL,SP,HO,DE,ID,AB,C1,RP,EM,FU,FX,CR,NR,TC,PU,PI,PA,SN,BN,DI,J9,JI,PD,PY,VL,IS,PN,SU,SI,BP,EP,AR,DI2,PG,SC,GA,UT = data
 	TI=TI.capitalize()
 	
 	query=Paper.objects.filter(title=TI) #Tests if the paper is already in the database

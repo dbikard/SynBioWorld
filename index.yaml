@@ -90,6 +90,11 @@ indexes:
   - name: sbw
     direction: desc
 
+- kind: librarian_isi_data
+  properties:
+  - name: __key__
+    direction: desc
+
 - kind: librarian_journal
   properties:
   - name: __key__

@@ -1,8 +1,8 @@
-from .models import Paper, Person, Journal, Institution, Country, Town, Citation, Authorship, Affiliation
+from .models import Paper, Person, Journal, Institution, Country, Town, Citation, Authorship, Affiliation, ISI_data
 from datetime import datetime
 from django.conf import settings
 from django.contrib.syndication.views import Feed
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.shortcuts import get_object_or_404, render_to_response
 from django.views.generic.list_detail import object_list, object_detail
 from django.views.generic.simple import direct_to_template
@@ -12,7 +12,7 @@ import re
 from django.core.exceptions import ObjectDoesNotExist
 from data_utils import update_SBW, cleanUnivName, parse_ISI_data, get_cited_paper
 from google.appengine.api import taskqueue
-
+from django.contrib.auth.decorators import login_required
 
 #~ def search(request):
 	#~ if request.method == 'POST':
@@ -62,8 +62,8 @@ def list_paper(request,list_type):
 		query= Paper.objects.order_by('-sbw')
 		des="Ordered by number of citations from other SB papers."
 	elif list_type=="recent":
-		des="Recent publications from the top10 SB journals."
-		best_journals=Journal.objects.order_by('-sbw').values_list('pk',flat=True)[:10]
+		des="Recent publications from the top20 SB journals."
+		best_journals=Journal.objects.order_by('-sbw').values_list('pk',flat=True)[:20]
 		best_journals=map(int,best_journals)
 		query=Paper.objects.filter(journal__in=best_journals,pubYear=datetime.now().year).order_by('-pubMonth')
 	
@@ -96,7 +96,7 @@ def show_institution(request, key):
 	return object_detail(request, Institution.objects.all(), key)
 	
 def list_country(request):
-	des="Ordered by importance in the synthetic biology field."
+	des="By order of importance in the synthetic biology field."
 	return object_list(request, Country.objects.filter(has_SB=True).order_by('-sbw'), paginate_by=20,extra_context={'description':des})
 
 def show_country(request, key):
@@ -104,8 +104,9 @@ def show_country(request, key):
 
 def import_ISI_data(request):
 	if request.method=='POST':
-		data=request.POST['data']
-	
+		pk=int(request.POST['pk'])
+		data=ISI_data.objects.get(pk=pk)
+		pubdata=data.data
 		new_papers=[]
 		already_in_DB=[]
 		pubdata=pubdata.split('\t')
@@ -127,9 +128,26 @@ def import_ISI_data(request):
 					new_citation=Citation(cited_paper=cited_paper,citing_paper=new_paper)
 					new_citation.save()
 
+
+	return HttpResponse('done')
+
+
 def update_SBW_view(request):
 	update_SBW()
+	data=ISI_data.objects.all()
+	for d in data:
+		d.delete()
+
+	return HttpResponse('done')
 	
+def import_state(request):
+	count=str(ISI_data.objects.all().count())
+	return HttpResponse(count, mimetype='text/plain')
+
+def add_progress(request):
+	return render_to_response('librarian/add_progress.html',context_instance=RequestContext(request))
+
+@login_required
 def add_papers(request):
 	if request.method == 'POST':
 		form=addPapersForm(request.POST)
@@ -138,15 +156,13 @@ def add_papers(request):
 			data=form.cleaned_data['ISIdata']
 			data=data.split('\r\n')[1:]
 			for pubdata in data:
-				PT,AU,BA,ED,GP,AF,CA,TI,SO,SE,LA,DT,CT,CY,CL,SP,HO,DE,ID,AB,C1,RP,EM,FU,FX,CR,NR,TC,PU,PI,PA,SN,BN,DI,J9,JI,PD,PY,VL,IS,PN,SU,SI,BP,EP,AR,DI2,PG,SC,GA,UT = pubdata.split('\t')
-				reduced_data='\t'.join([AU,SO,TI, PD, VL, AB, DI, CR, PY, C1, EM])	
-				taskqueue.add(url='/librarian/import_ISI_data', params={'data': reduced_data})
+				isi=ISI_data(data=pubdata)
+				isi.save()
+				taskqueue.add(url='/librarian/import_ISI_data/', params={'pk': isi.pk})
 			
-			taskqueue.add(url='/librarian/update_SBW')
+			taskqueue.add(url='/librarian/update_SBW/')
 			
-			new_papers=[]
-			already_in_DB=[]
-			return  render_to_response('librarian/add_complete.html',{'new_papers': new_papers, 'already_in_DB': already_in_DB},context_instance=RequestContext(request))
+			return  render_to_response('librarian/add_progress.html',context_instance=RequestContext(request))
 
 	else:
 		form = addPapersForm()

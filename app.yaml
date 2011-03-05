@@ -1,5 +1,5 @@
 application: synbioworlds
-version: 0-5
+version: 0-6
 runtime: python
 api_version: 1
 
@@ -13,6 +13,10 @@ handlers:
 - url: /_ah/queue/deferred
   script: djangoappengine/deferred/handler.py
   login: admin
+
+- url: /favicon.ico
+  static_files: static/images/favicon.ico
+  upload: static/images/favicon.ico
 
 - url: /blank.html
   static_files: blank.html

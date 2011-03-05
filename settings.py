@@ -107,6 +107,7 @@ MEDIA_BUNDLES = (
     ('mainjs.js',
          'jquery.js',
          'channel_chat.js',
+	 'jquery.poll.js',
     ),
 )
 

@@ -16,5 +16,7 @@ urlpatterns = patterns('librarian.views',
     (r'^add/$', 'add_papers'),
     (r'^import_ISI_data/$', 'import_ISI_data'),
     (r'^update_SBW/$', 'update_SBW_view'),
+    (r'^import_state/$', 'import_state'),
+    (r'^add_progress/$', 'add_progress'),
     #~ (r'^search/$', 'search'),
 )

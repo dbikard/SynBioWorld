@@ -34,7 +34,7 @@ class Country(models.Model):
         return Institution.objects.filter(country=self).order_by('-sbw')
 
     def get_SBW(self):
-	self.sbw=sum([inst.get_SBW() for inst in self.get_institutions()])
+	self.sbw=sum([inst.sbw for inst in self.get_institutions()])
 	self.save()
 	return self.sbw
 
@@ -66,7 +66,7 @@ class Institution(models.Model):
         return people
         
     def get_SBW(self):
-	self.sbw=sum([scientist.get_SBW() for scientist in self.get_present_employee()])
+	self.sbw=sum([scientist.sbw for scientist in self.get_present_employee()])
 	self.save()
 	return self.sbw
 
@@ -102,7 +102,7 @@ class Person(models.Model):
         return inst
 
     def get_SBW(self):
-	self.sbw=sum([pub.get_SBW() for pub in self.get_papers()])
+	self.sbw=sum([pub.sbw for pub in self.get_papers()])
 	self.save()
 	return self.sbw
     
@@ -123,7 +123,7 @@ class Journal(models.Model):
         return Paper.objects.filter(journal=self).order_by('-pubYear')
 
     def get_SBW(self):
-	self.sbw=sum([pub.get_SBW() for pub in self.get_papers()])
+	self.sbw=sum([pub.sbw for pub in self.get_papers()])
 	self.save()
 	return self.sbw
 
@@ -178,6 +178,10 @@ class Affiliation(models.Model):
     #~ keyword=models.ForeignKey(Keyword)
     #~ count=models.IntegerField(null=True)
     
+class ISI_data(models.Model):
+    data=models.TextField(null=True)
+
+
 class PeopleSitemap(Sitemap):
     changefreq = "never"
 
