@@ -117,6 +117,12 @@ indexes:
   - name: pubMonth
     direction: desc
 
+- kind: librarian_paper
+  properties:
+  - name: title
+  - name: sbw
+    direction: desc
+
 - kind: librarian_person
   properties:
   - name: __key__

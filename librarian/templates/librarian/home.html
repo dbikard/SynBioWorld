@@ -1,10 +1,47 @@
 {% extends 'librarian/base.html' %}
-{% block title %}Librarian{% endblock %}
+{% block title %}SynBioWorld{% endblock %}
 
 
 {% block content %}
-<h1>Browse the world of Synthetic Biology</h1>
 <p>
 This site is under construction, and the database may not be availbale from time to time.
 </p>
+<div id="home_papers">
+	<div id="top_papers">
+	<h3>Top Synthetic Biology papers </h3>
+	{% for paper in top %}
+	     {% if paper.title %}
+	    <li>
+	      <a class="title" href="{% url librarian.views.show_paper paper_id=paper.pk %}">{{ paper.title}}</a> <br>
+	      {% for author in paper.get_authors %} 
+		<a class="author" href="{% url librarian.views.show_person person_id=author.pk %}">{{author.initials}} {{author.last_name}}</a>,{% endfor %} 
+		{% if paper.journal %}
+		      <a class="journal" href="{% url librarian.views.show_journal key=paper.journal.pk %}">{{paper.journal.short_name}}</a>  
+		{% endif %}
+		<span class="year"> {{paper.pubYear}} </span>
+	    </li>
+	     {% endif%}
+	{% endfor %}
+	</div>
+	<div id="recent_papers">
+	<h3>Recent Synthetic Biology papers </h3>
+	{% for paper in recent %}
+	     {% if paper.title %}
+	    <li>
+	      <a class="title" href="{% url librarian.views.show_paper paper_id=paper.pk %}">{{ paper.title}}</a> <br>
+	      {% for author in paper.get_authors %} 
+		<a class="author" href="{% url librarian.views.show_person person_id=author.pk %}">{{author.initials}} {{author.last_name}}</a>,{% endfor %} 
+		{% if paper.journal %}
+		      <a class="journal" href="{% url librarian.views.show_journal key=paper.journal.pk %}">{{paper.journal.short_name}}</a>  
+		{% endif %}
+		<span class="year"> {{paper.pubYear}} </span>
+	    </li>
+	     {% endif%}
+	{% endfor %}
+	</div>
+</div>
+<div id="pearltrees">
+<h3>Help us build the tree of Synthetic Biology!! </h3>
+<object width="635" height="500" id="pt-embed-59803-385-object" type="application/x-shockwave-flash" data="http://cdn.pearltrees.com/s/embed/getApp"><param name="flashvars" value="lang=en_En&amp;embedId=pt-embed-59803-385&amp;treeId=59803&amp;pearlId=422485&amp;treeTitle=Synthetic%20Biology&amp;site=www.pearltrees.com%2F" /><param name="movie" value="http://cdn.pearltrees.com/s/embed/getApp" /><param name="wmode" value="opaque" /><param name="allowscriptaccess" value="always" /><strong><a href="http://www.pearltrees.com/pearls/422485/" title="Synthetic Biology" style="text-decoration:underline;">Synthetic Biology</a></strong></object>
+</div>
 {% endblock %}

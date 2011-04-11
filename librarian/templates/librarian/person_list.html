@@ -2,22 +2,50 @@
 {% block title %}Person listing{% endblock %}
 
 {% block content %}
-<h1>Synthetic Biologists <span style="font-size:12px">({{ total }})</span></h1>
+<h2>Synthetic Biologists <span style="font-size:12px">({{ total }})</span></h2>
 {{ description }}
+<div id="paginator" class="top">
+<div id="nav">
+    <span class="step-links">
+        {% if objects.has_previous %}
+            <a class="previous" href="?page={{ objects.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ objects.number }} of {{ objects.paginator.num_pages }}
+        </span>
+
+        {% if objects.has_next %}
+            <a class="next"  href="?page={{ objects.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div>
+</div>
+
+
 <ul>
-  {% for person in object_list %}
+  {% for person in objects.object_list %}
     <li>
-      <a href="{% url librarian.views.show_person person_id=person.pk %}">{{ person.first_name }} {{ person.last_name }}</a>
+      <a class="title" href="{% url librarian.views.show_person person_id=person.pk %}">{{ person.first_name }} {{ person.last_name }}</a>
     </li>
   {% endfor %}
 </ul>
 
-<div>
-  {% if has_previous %}
-    <a href="{% url librarian.views.list_people %}?page={{ previous }}">&lt;-previous</a>
-  {% endif %}
-  {% if has_next %}
-    <a href="{% url librarian.views.list_people %}?page={{ next }}">next-&gt;</a>
-  {% endif %}
+<div id="paginator" class="bottom">
+<div id="nav">
+    <span class="step-links">
+        {% if objects.has_previous %}
+            <a href="?page={{ objects.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ objects.number }} of {{ objects.paginator.num_pages }}
+        </span>
+
+        {% if objects.has_next %}
+            <a href="?page={{ objects.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div>
 </div>
 {% endblock %}

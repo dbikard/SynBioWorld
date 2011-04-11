@@ -38,13 +38,14 @@
 
     {% block extra-head %}
     {% endblock %}
+    <meta name="google-site-verification" content="pRr92BLzEv2QnXUf9dxOIls_SlyuFJHiczZRN9KItCo" />
   </head>
 
   <body>
     <div id="header">
-        <div id="registration-menu" align="right">
+        <div id="registration-menu">
           {% if user.is_authenticated %}
-            Welcome, {{ user.username }}!
+            {{ user.username }} - 
             <a href="{% url django.contrib.auth.views.logout %}">Logout</a>
           {% else %}
             <a href="{% url django.contrib.auth.views.login %}?next={{ request.path }}">Login</a>

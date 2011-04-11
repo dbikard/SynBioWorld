@@ -3,14 +3,13 @@
 
 
 {% block content %}
-<a href="{% url librarian.views.list_institution %}">Back to listing</a>
-<h1>{{ object.name }} - {{ object.country }}</h1>
+<h2>{{ object.name }} - {{ object.country }}</h2>
   
 <h3>Present members</h3>
 <ul>
 {% for person in object.get_present_employee %}
     <li>
-      <a href="{% url librarian.views.show_person person_id=person.pk %}">{{ person.first_name }} {{ person.last_name }}</a>
+      <a class="title" href="{% url librarian.views.show_person person_id=person.pk %}">{{ person.first_name }} {{ person.last_name }}</a>
     </li>
   {% endfor %}
 </ul>

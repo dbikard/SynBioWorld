@@ -3,18 +3,21 @@
 
 {% block content %}
  {% if object.doi %}
-<a href="http://dx.doi.org/{{ object.doi }}">Link to publisher</a>
+ <div id="publi_link">
+<a href="http://dx.doi.org/{{ object.doi }}" target="_blank">Link to publisher</a>
+</div>
  {% endif %}
- <br>
-<h1>{{ object.title }}</h1>
 
-<h2>
+<h2>{{ object.title }}</h2>
+
+<h3>
 {% for author in object.get_authors %} 
-<a style="color:grey" href="{% url librarian.views.show_person person_id=author.pk %}">{{author.initials}} {{author.last_name}}</a>
+<a style="color:grey" href="{% url librarian.views.show_person person_id=author.pk %}">{{author.initials}} {{author.last_name}},</a>
 {% endfor %}
-</h2>
+</h3>
 <div>
-<a href="{% url librarian.views.show_journal key=object.journal.pk %}"> {{object.journal.name}} </a> - {{object.pubYear}}
+{% if object.journal %}
+<a class="title" href="{% url librarian.views.show_journal key=object.journal.pk %}"> {{object.journal.name}} </a> {% endif %}- {{object.pubYear}}
 </div>
 
 

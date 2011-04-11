@@ -1,21 +1,29 @@
-from .models import Paper, Person, Journal, Institution, Country, Town, Citation, Authorship, Affiliation
+from .models import Paper, Person, Journal, Institution, Country, Town, Citation, Authorship, Affiliation, Raw_cit
 from django.core.exceptions import ObjectDoesNotExist
-
+from google.appengine.api import taskqueue
 import re
 
-def update_SBW():
-	 classes=[Paper, Person, Journal, Institution, Country]
-	 for c in classes:
-		 entities=c.objects.all()
-		 for e in entities:
-			 e.get_SBW()
-			 print e, e.sbw
+
+def ISIquery(ran,citedList):
+    # ran is the range of citations to extract from citedList. It must be smaller than 16.
+    isiquery=""
+    for i in ran:
+        vec=citedList[i][0].split(', ')
+        source=Journal.objects.get(short_name=vec[2].capitalize())
+        source=source.name
+        if source:
+            isiquery+="(AU=(%s) AND PY=(%s) AND SO=(%s))" % (vec[0],vec[1],source)
+            isiquery+=" OR "
+        else:
+            print "record omitted: journal not found " + vec[2]
+    isiquery=isiquery[:-4]
+    return isiquery
 
 def cleanUnivName(univName):
         if "ETH" in univName:
                 univName="ETH"
         elif "Univ Roma" in univName or "Univ Rome" in univName:
-                univName="Univ Roma Tre"
+		univName="Univ Roma Tre"
         elif "univ Lyon" in univName:
                 univName="Univ Lyon"
         elif "Aix Marseille" in univName:
@@ -67,63 +75,44 @@ def uniquify_journals():
 				for i in range(1,len(q)):
 					q[i].delete()
 
-def get_cited_paper(cit):
-	
-	cit_data=cit.split(", ")
-	
-	if "DOI" in cit_data[-1]:
-		cited_DOI=cit_data[-1].split(' ')[1].strip()
-		cited_paper=Paper.objects.filter(doi=cited_DOI)
-	
-	elif len(cit_data)==1:
-		cit_title=cit_data[0].capitalize()
-		cited_paper=Paper.objects.filter(title=cit_title)
-	
-	elif len(cit_data)>2:
-		cited_first_au=cit_data[0].split(' ')
-		cited_last_name, cited_init = ' '.join(cited_first_au[:-1]), cited_first_au[-1].strip()
-		cited_last_name=cited_last_name.strip().capitalize()
-		try:
-			cited_year=int(cit_data[1])
-			cited_jour=cit_data[2].capitalize()
-		except:
-			return None
-		
-		try:
-			cited_first_au=Person.objects.get(last_name=cited_last_name, initials=cited_init)
-		except ObjectDoesNotExist:
-			cited_first_au=None
-		
-		
-		if cited_first_au:
-			cited_paper=Paper.objects.filter(first_au=cited_first_au).filter(pubYear=cited_year)
-	
-			cited_jour=Journal.objects.filter(short_name=cited_jour)
-			cited_jour=list(cited_jour)
-			if cited_jour:
-				cited_jour=cited_jour[0]
-				cited_paper=cited_paper.filter(journal=cited_jour)
-	
-			if len(cit_data)>3:
-				vol=cit_data[3][1:]
-				cited_paper=cited_paper.filter(volume=vol)
-	
-		else:
-			cited_paper=[]
-	else: #case not considered
-		cited_paper=[]
-	
-	if type(cited_paper)!=Paper:
-		cited_paper=list(cited_paper)
-		if len(cited_paper)==1:
-			cited_paper=cited_paper[0]
-			return cited_paper
-	else:
-		return cited_paper
+	#Do the same for short_names
+	journals=Journal.objects.all()
+	journals=list(journals)
+	journal_names=[j.short_name for j in journals]
+	for short_name in journal_names:
+		q=Journal.objects.filter(short_name=short_name)
+		q=list(q)
+		if len(q)>1:
+                        names=[j.name for j in q]
+			print names[0], short_name
+			for i in range(1,len(q)):
+					q[i].delete()
+			
+
+def parse_ISI_data2(data):
+	months={"jan":1,"feb":2,"mar":3,"apr":4,"may":5,"jun":6,"jul":7,"aug":8,"sep":9,"oct":10,"nov":11,"dec":12}
 
 
+	PT,AU,BA,ED,GP,AF,CA,TI,SO,SE,LA,DT,CT,CY,CL,SP,HO,DE,ID,AB,C1,RP,EM,FU,FX,CR,NR,TC,PU,PI,PA,SN,BN,DI,J9,JI,PD,PY,VL,IS,PN,SU,SI,BP,EP,AR,DI2,PG,SC,GA,UT = data
+	TI=TI.capitalize()
 
+	try:
+            paper=Paper.objects.get(title=TI)
+        except:
+            return 1
 
+        SO=SO.capitalize()
+        jour, created=Journal.objects.get_or_create(name=SO)
+        if created:
+            try:
+                jour.get_name() #finds this abbreviated name of the journal (useful to find which citation matches which paper)
+            except:
+                pass
+
+        paper.journal=jour
+        paper.save()
+        
+	
 def parse_ISI_data(data):
 	months={"jan":1,"feb":2,"mar":3,"apr":4,"may":5,"jun":6,"jul":7,"aug":8,"sep":9,"oct":10,"nov":11,"dec":12}
 
@@ -131,14 +120,18 @@ def parse_ISI_data(data):
 	PT,AU,BA,ED,GP,AF,CA,TI,SO,SE,LA,DT,CT,CY,CL,SP,HO,DE,ID,AB,C1,RP,EM,FU,FX,CR,NR,TC,PU,PI,PA,SN,BN,DI,J9,JI,PD,PY,VL,IS,PN,SU,SI,BP,EP,AR,DI2,PG,SC,GA,UT = data
 	TI=TI.capitalize()
 	
-	query=Paper.objects.filter(title=TI) #Tests if the paper is already in the database
+	query=Paper.objects.filter(title=TI) #Tests if the paper info was already added to the database
 	if C1 and not query:
 		auNamesList=[[j.strip() for j in i.split(", ")] for i in AU.split(";")]
 	
 		############# Journal #############
 		SO=SO.capitalize()
 		jour, created=Journal.objects.get_or_create(name=SO)
-	
+		if created:
+                    try:
+                        jour.get_name() #finds this abbreviated name of the journal (useful to find which citation matches which paper)
+                    except:
+                        pass
 		############# Pub Date ############
 		PM=0
 		if PD:
@@ -151,16 +144,57 @@ def parse_ISI_data(data):
 	
 		
 		############# Paper ############
-		new_paper=Paper(title = TI,
+                #checks if a Raw_cit objects corresponding to the paper already exists in the database
+                raw_cit=None
+                if DI:
+                    raw_cit=Raw_cit.objects.filter(doi=DI)
+                if not raw_cit:
+                    #applies a first set of filter then goes through all the raw_cits to find a good match
+                    raw_cit=Raw_cit.objects.filter(last_name=auNamesList[0][0]).filter(jour=jour)
+                    raw_cit=list(raw_cit)
+                    for cit in raw_cit:
+                        if cit.vol:
+                            if cit.vol!=VL:
+                                raw_cit.remove(cit)
+                                continue
+                        if cit.year:
+                            if cit.year!=int(PY):
+                                raw_cit.remove(cit)
+                                continue
+##                        if cit.page:
+##                            if cit.page[1:]!=PN:
+##                                raw_cit.remove(cit)
+##                                continue
+
+                
+                if len(raw_cit)>=1:
+                    #if a single match is found update this paper data with the ISI data
+                    raw_cit=raw_cit[0] #we chose the first raw_cit in case there are several matches... we should implement something else in this case
+                    new_paper=Paper.objects.get(raw_cit=raw_cit)
+                    new_paper.title=TI
+                    new_paper.journal=jour
+                    new_paper.volume=VL
+                    new_paper.page=PN
+                    new_paper.pubMonth=int(PM)
+                    new_paper.pubYear=int(PY)
+                    new_paper.abstract=AB
+                    new_paper.doi=DI
+                    new_paper.raw_citations=CR
+                elif len(raw_cit)==0:
+                    #create a new Paper object
+                    new_paper=Paper(title = TI,
 				journal = jour,
 				volume = VL,
+                                page = PN,
 				pubMonth = int(PM),
 				pubYear = int(PY),
 				abstract=AB,
 				doi=DI,
 				raw_citations=CR,
+                                sbw=0,
 				)
-		new_paper.save()
+
+                new_paper.save()
 	
 	
 		############## Authors - Affiliations ####################
@@ -168,7 +202,7 @@ def parse_ISI_data(data):
 		corres_au=RP.split(",")[0]
 		if "[" in C1:
 		        affs=C1[1:].split("; [")
-		elif  ";" in C1: #in this case, there are several affiliations bu we don't who belongs to what institution.
+		elif  ";" in C1: #in this case, there are several affiliations but we don't know who belongs to what institution.
 		#Neverthless in many cases the different institutions are just different departemnts of the same institution, so we check for this
 		        affs=[[i.strip() for i in x.split(",")] for x in C1.split(";")]
 		        sameInst=1
@@ -183,11 +217,10 @@ def parse_ISI_data(data):
 		        affs=[C1]
 		
 		for aff in affs:
-		        if "[" not in C1 and len(affs)>1:
+                        if "[" not in C1 and len(affs)>1:
 		                #in this case we do not know which authors belong to which affiliation
-		                current_countryID=None
-		                current_key=None
-		                inst=None
+		                na_country, created=Country.objects.get_or_create(name="N.A",has_SB=True,sbw=0)
+		                current_inst, created=Institution.objects.get_or_create(name="N.A",country=na_country)
 		                auNames=auNamesList
 		        else:
 		                if "]" in aff:
@@ -226,8 +259,26 @@ def parse_ISI_data(data):
 				        
 				current_country.has_SB=True
 				current_country.save()
+	
+				################ Institutions #################################
+				univName=affiliation[0]
+				univName=cleanUnivName(univName)
+				inst_query=Institution.objects.filter(name=univName)
+				if inst_query.count()==1: #try to filter on the univName alone first in the case the country wasn't identified.
+                                    current_inst=inst_query[0]
+                                    current_country=current_inst.country
+                                elif inst_query.count()>1: #If several institutions from different countries have the same name
+                                    inst_query=inst_query.filter(country=current_country)
+                                    if inst_query:
+                                        current_inst=inst_query[0]
+                                    else:
+                                        current_inst=Institution(name=univName,country=current_country)
+                                        current_inst.save()
+                                else:
+                                    current_inst=Institution(name=univName,country=current_country)
+                                    current_inst.save()
 
-				################ Cities ##################################################
+                                ################ Cities ##################################################
 				townName=re.search("([A-Z][a-z]+\s?)+",affiliation[-2])
 				if townName:
 				        townName=townName.group().strip()
@@ -241,11 +292,6 @@ def parse_ISI_data(data):
 				        townName="N.A."
 				            
 				current_town, created=Town.objects.get_or_create(name=townName,country=current_country)
-	
-				################ Institutions #################################
-				univName=affiliation[0]
-				univName=cleanUnivName(univName)
-				inst, created=Institution.objects.get_or_create(name=univName,country=current_country)
 		
 			########################   Scientists   ##################################################
 			for au in auNames:
@@ -288,11 +334,91 @@ def parse_ISI_data(data):
 						new_paper.save()
 	
 			                #################### Affiliations ##############################
-					if inst:
-			                	current_aff, created=Affiliation.objects.get_or_create(institution=inst,employee=current_scientist,year=PY)
+					current_aff, created=Affiliation.objects.get_or_create(institution=current_inst,employee=current_scientist,year=PY)
 
 		return new_paper, 1
 	elif C1:
 		return query[0], 0
 	else:
 		return "", 0
+
+
+
+
+def uniquify_raw_cits():
+    all_cits=Raw_cit.objects.all()
+    for cit in all_cits:
+        raw_cit_list=None
+        if cit.doi:
+            raw_cit_list=Raw_cit.objects.filter(doi=cit.doi)
+            raw_cit_list=list(raw_cit_list)
+            
+
+        else: #if the cit doesn't have a doi
+            raw_cit_list=Raw_cit.objects.filter(last_name=cit.last_name).filter(jour=cit.jour)
+            raw_cit_list=list(raw_cit_list)
+            if len(raw_cit_list)>1:
+                for xcite in raw_cit_list:
+                    if xcite.year and cit.year:
+                        if xcite.year!=cit.year:
+                            raw_cit_list.remove(xcite)
+                            continue
+                    if xcite.vol and cit.vol:
+                        if xcite.vol!=cit.vol:
+                            raw_cit_list.remove(xcite)
+                            continue
+                    if xcite.page and cit.page:
+                        if xcite.page!=cit.page:
+                            raw_cit_list.remove(xcite)
+                            continue
+
+        if len(raw_cit_list)>1:
+            #identifies the raw_cit associated with the good paper 
+            gpaper=None
+            gcit=None
+            for r in raw_cit_list:
+                p=r.get_paper()
+                if p.title:
+                    gpaper=p
+                    gcit=r
+                    break
+
+            if not gcit:
+                gcit=raw_cit_list[0]
+                gpaper=gcit.get_paper()
+
+            for r in raw_cit_list:
+                if r!=gcit:
+                    #correct citations for duplicate cits
+                    if not gcit.doi and r.doi:
+                        gcit.doi=r.doi
+                        gcit.save()
+                        
+                    p=r.get_paper()
+                    if p!=gpaper:
+                        wcitations=Citation.objects.filter(cited_paper=p)
+                        for w in wcitations:
+                            w.cited_paper=gpaper
+                            w.save()
+
+                        p.delete()
+                    print r.cit
+                    r.delete()  
+                
+            
+
+def corr_jour():
+    prog = re.compile("(?P<last_name>\w+)[.\s](?P<init>\w+)(?:,\s)?(?P<year>\d+)?(?:,\s)(?P<journal>(?:[\s-]?\w+)+)(?:,\s)?(?P<vol>V\d+)?(?:,\s)?(?P<page>[PE]\d+)?(?:,\s)?(?P<doi>DOI .+$)?",re.UNICODE)
+    all_cits=Raw_cit.objects.all()
+    for cit in all_cits:
+        m=prog.match(cit.cit)
+        last_name,init,year,journal,vol,page,doi=m.groups()
+        cited_jour, created=Journal.objects.get_or_create(short_name=journal.capitalize())
+        if created:
+            try:
+                cited_jour.get_name()
+                print cited_jour.name
+            except:
+                print "!!!"+cited_jour.short_name
+        
+        

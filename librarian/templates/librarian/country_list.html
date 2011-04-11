@@ -2,22 +2,50 @@
 {% block title %}Country listing{% endblock %}
 
 {% block content %}
-<h1>Country listing</h1>
+<h2>Country listing</h2>
 {{ description }}
+
+<div id="paginator" class="top">
+<div id="nav">
+    <span class="step-links">
+        {% if objects.has_previous %}
+            <a class="previous" href="?page={{ objects.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ objects.number }} of {{ objects.paginator.num_pages }}
+        </span>
+
+        {% if objects.has_next %}
+            <a class="next"  href="?page={{ objects.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div>
+</div>
+
 <ul>
-  {% for object in object_list %}
+  {% for object in objects.object_list %}
     <li>
-      <a href="{% url librarian.views.show_country key=object.pk %}">{{ object.name}} </a>
+      <a class="title" href="{% url librarian.views.show_country key=object.pk %}">{{ object.name}} </a>
     </li>
   {% endfor %}
 </ul>
 
-<div>
-  {% if has_previous %}
-    <a href="{% url librarian.views.list_country %}?page={{ previous }}">&lt;-previous</a>
-  {% endif %}
-  {% if has_next %}
-    <a href="{% url librarian.views.list_country %}?page={{ next }}">next-&gt;</a>
-  {% endif %}
+<div id="paginator" class="bottom">
+<div id="nav">
+    <span class="step-links">
+        {% if objects.has_previous %}
+            <a href="?page={{ objects.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ objects.number }} of {{ objects.paginator.num_pages }}
+        </span>
+
+        {% if objects.has_next %}
+            <a href="?page={{ objects.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div>
 </div>
 {% endblock %}

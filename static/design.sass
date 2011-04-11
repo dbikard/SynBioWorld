@@ -53,13 +53,37 @@ body
 a
   color: #1985B5
 
+  &.title
+    text-decoration: none
+    font-weight: bold
+    
+  &.journal
+    font-size: 90%
+    font-style: italic
+    font-weight: bold
+    color: #36393D
+    text-decoration: none
+  
+  &.author
+    font-size: 90%
+    font-style: italic
+    color: #36393D
+    text-decoration: none
+
+li
+  margin-bottom: 5px
+
+.year
+  font-size: 90%
+  color: #36393D
+  text-decoration: none
+  
 a:hover
   text-decoration: underline
 
 #header
-  height: 100px
+  height: 55px
   border-bottom: 2px solid #36393D
-  margin-bottom: 10px
   margin-top: 5px
   
 #header a, .post h1 a
@@ -68,6 +92,12 @@ a:hover
 
 .post h1 a:hover
   text-decoration: underline
+
+#registration-menu
+  position: absolute
+  top: 0
+  right: 0
+  margin-right: 10px
 
 #logo
   float: left
@@ -81,7 +111,6 @@ a:hover
   float: right
 
 .menu
-  clear: both
   list-style: none
   text-align: center
   margin: 0
@@ -96,12 +125,110 @@ a:hover
       font-weight: bold
       color: black
 
-#internal
+#internal_menu
+  position: relative
+  top: -5px
+  padding-top: 5px
+  text-align: center
+  font-size: 14px
+  margin-bottom: 10px
+  height: 20px
+  background-color: #EEEEEE
+  border-radius: 5px
+  box-shadow: 0 0 5px rgba(0,0,0,.50)
+
   li
+    display: inline
+    margin: 0 10px 0 10px
+    
+    &.active-menu-item
+      font-weight: bold
+
+  a
+    text-decoration: none
+    color: black
+    
+  a:hover
+    font-weight: bold
+
+#sorting
+  a
+    color: #36393D
     font-size: 12px
+    text-decoration: none
+  
+#publi_link
+  a
+    text-decoration: none
+    font-weight: bold
+    padding: 5px
+    width: 60px
+    float: right
+    text-align: center
+    margin-left: 10px
+    background-color: #EEEEEE
+    border-radius: 5px
+
+    &:hover
+      box-shadow: inset 0 0 5px rgba(0,0,0,.50)
+
+#paginator.top
+  margin: 10px 0 10px 0
+
+#paginator.bottom
+  margin: 0 0 10px 0
+  
+#nav
+  display: inline
+  position: relative
+  width: 100%
+  border: 1px solid #EEEEEE
+  border-radius: 5px
+  
+  a
+    text-decoration: none
+    color: black
+    font-weight: bold
+    padding: 1px 5px 1px 5px
+    width: 70px
+    text-align: center
+    background-color: #EEEEEE
+    border-radius: 5px
+  
+    &.previous
+      margin-right: 10px
+    
+    &.next
+      margin-left: 10px
+
+    &:hover
+      box-shadow: inset 0 0 5px rgba(0,0,0,.50)
+
+#top_papers
+  position: relative
+  width: 300px
+  float: left
+
+#recent_papers
+  position: relative
+  top: 0
+  width: 300px
+  float: right
+
+#pearltrees
+  position: relative
+  clear: both
+  margin-top: 10px
+  text-align: center
 
 h1
   margin-bottom: 10px
+
+  &.home
+    text-align: center
+
+h2
+  line-height: 130%
 
 h2 a.external, h3 a.external
   color: #36393D
@@ -109,6 +236,16 @@ h2 a.external, h3 a.external
 
   &:hover
     text-decoration: underline
+
+h3
+  margin: 10px 0 10px 0
+  
+  a
+    text-decoration: none
+    
+    &:hover
+      text-decoration: underline
+    
 
 .post
   line-height: 1.6em
@@ -133,14 +270,17 @@ h2 a.external, h3 a.external
 .sidebar-block
   margin-bottom: 30px
 
-#sidebar form
-  background-color: #F0EDDE
-  padding: 10px
+#sidebar
+  padding-top: 10px
+  
+  form
+    background-color: #F0EDDE
+    padding: 10px
 
-  -moz-border-radius: 10px
-  -webkit-border-radius: 10px
-  -ms-border-radius: 10px
-  border-radius: 10px
+    -moz-border-radius: 10px
+    -webkit-border-radius: 10px
+    -ms-border-radius: 10px
+    border-radius: 10px
 
 .join-button
   padding: 5px
@@ -163,7 +303,7 @@ h2 a.external, h3 a.external
   padding-left: 0px
 
   ul
-    margin-bottom: 10px
+    margin-bottom: 5px
     margin-left: 0px
     list-style: none
 

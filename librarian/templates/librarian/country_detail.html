@@ -2,13 +2,12 @@
 {% block title %}{{ object.name }}{% endblock %}
 
 {% block content %}
-<h1>{{ object.name }}</h1>
-<a href="{% url librarian.views.list_country %}">Back to listing</a>
+<h2>{{ object.name }}</h2>
 
 <ul>
   {% for institution in object.get_institutions %}
     <li>
-      <a href="{% url librarian.views.show_institution key=institution.pk %}">{{ institution.name}}</a> 
+      <a class="title" href="{% url librarian.views.show_institution key=institution.pk %}">{{ institution.name}}</a> 
     </li>
   {% endfor %}
 </ul>

@@ -2,9 +2,9 @@
 {% block title %}Paper listing{% endblock %}
 
 {% block content %}
-<h1>Synthetic Biology Papers <span style="font-size:12px">({{ total }})</span></h1>
+<h2>Synthetic Biology Papers <span style="font-size:12px">({{ total }})</span></h2>
 
-<div id="internal">
+<div id="sorting">
 	<ul class="menu">
 		<li {% if list_type == "best" %} class="active-menu-item"{% endif %}><a href="{% url librarian.views.list_paper list_type='best' %}">Top SB papers</a></li>|
 		<li {% if list_type == "recent" %} class="active-menu-item"{% endif %}><a href="{% url librarian.views.list_paper list_type='recent' %}">Recent SB papers</a></li>
@@ -14,24 +14,56 @@
 
 
 {{ description }}
+
+<div id="paginator" class="top">
+<div id="nav">
+    <span class="step-links">
+        {% if objects.has_previous %}
+            <a class="previous" href="?page={{ objects.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ objects.number }} of {{ objects.paginator.num_pages }}
+        </span>
+
+        {% if objects.has_next %}
+            <a class="next"  href="?page={{ objects.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div>
+</div>
+
 <ul>
-  {% for paper in object_list %}
-    <li>
-      <a href="{% url librarian.views.show_paper paper_id=paper.pk %}">{{ paper.title}}</a> 
-      <a style="color:magenta" href="{% url librarian.views.show_journal key=paper.journal.pk %}">{{paper.journal.short_name}}</a>  
-      {{paper.pubYear}} <br>
-      {% for author in paper.get_authors %} 
-	<a style="color:grey" href="{% url librarian.views.show_person person_id=author.pk %}">{{author.initials}} {{author.last_name}}</a>,{% endfor %} 
-    </li>
-	{% endfor %}
+  {% for paper in objects.object_list %}
+     {% if paper.title %}
+	    <li>
+	      <a class="title" href="{% url librarian.views.show_paper paper_id=paper.pk %}">{{ paper.title}}</a> <br>
+	      {% for author in paper.get_authors %} 
+		<a class="author" href="{% url librarian.views.show_person person_id=author.pk %}">{{author.initials}} {{author.last_name}}</a>,{% endfor %} 
+		{% if paper.journal %}
+		      <a class="journal" href="{% url librarian.views.show_journal key=paper.journal.pk %}">{{paper.journal.short_name}}</a>  
+		{% endif %}
+		<span class="year"> {{paper.pubYear}} </span>
+	    </li>
+	     {% endif%}
+{% endfor %}
 </ul>
 
-<div>
-  {% if has_previous %}
-    <a href="{% url librarian.views.list_paper list_type=list_type %}?page={{ previous }}">&lt;-previous</a>
-  {% endif %}
-  {% if has_next %}
-    <a href="{% url librarian.views.list_paper list_type=list_type %}?page={{ next }}">next-&gt;</a>
-  {% endif %}
+<div id="paginator" class="bottom">
+<div id="nav">
+    <span class="step-links">
+        {% if objects.has_previous %}
+            <a href="?page={{ objects.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ objects.number }} of {{ objects.paginator.num_pages }}
+        </span>
+
+        {% if objects.has_next %}
+            <a href="?page={{ objects.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div>
 </div>
 {% endblock %}

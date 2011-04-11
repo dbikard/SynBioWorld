@@ -4,23 +4,27 @@
 {% block content %}
 
 
-<h1>{{ object.first_name }} {{ object.last_name }}</h1> 
-<h2> SBW score:   {{ object.sbw }}</h2>
+<h2>{{ object.first_name }} {{ object.last_name }}</h2> 
+<h3> SBW score:   {{ object.sbw }}</h3>
 
-
-<a href="{% url librarian.views.list_people %}">Back to listing</a>
 <ul>
-  <li>Institution:  <a href="{% url librarian.views.show_institution key=object.get_institution.pk %}">{{ object.get_institution.name}}</a></li>
-  
+{% if object.get_institution %}
+  <li>Institution:  <a class="title" href="{% url librarian.views.show_institution key=object.get_institution.pk %}">{{ object.get_institution.name}}</a></li>
+{% endif%}
+
   <li>SB papers: 
 	<ul>{% for paper in object.get_papers %}
-		<li><a href="{% url librarian.views.show_paper paper_id=paper.pk %}">{{ paper.title }}</a>
-		 <a style="color:magenta" href="{% url librarian.views.show_journal key=paper.journal.pk %}">{{paper.journal.short_name}}</a>  
-                     {{paper.pubYear}} <br>
-		{% for author in paper.get_authors %} 
-		<a style="color:grey" href="{% url librarian.views.show_person person_id=author.pk %}">{{author.initials}} {{author.last_name}}</a>,{% endfor %} 
-		
-		</li>
+		{% if paper.title %}
+	    <li>
+	      <a class="title" href="{% url librarian.views.show_paper paper_id=paper.pk %}">{{ paper.title}}</a> <br>
+	      {% for author in paper.get_authors %} 
+		<a class="author" href="{% url librarian.views.show_person person_id=author.pk %}">{{author.initials}} {{author.last_name}}</a>,{% endfor %} 
+		{% if paper.journal %}
+		      <a class="journal" href="{% url librarian.views.show_journal key=paper.journal.pk %}">{{paper.journal.short_name}}</a>  
+		{% endif %}
+		<span class="year"> {{paper.pubYear}} </span>
+	    </li>
+	     {% endif%}
 		{% endfor %}
 	</ul>
   </li>

@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %} Librarian {% endblock %}
+{% block title %} SynBioWorld {% endblock %}
 
 
 {% block internal_menu %}
 
 
-<div class="menu">
+<div id="internal_menu">
 	<ul>
 		<li><a href="{% url librarian.views.list_people %}">People</a></li>
 		<li><a href="{% url librarian.views.list_paper list_type='best' %}">Papers</a></li>
