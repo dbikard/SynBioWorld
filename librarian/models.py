@@ -136,7 +136,13 @@ class Journal(models.Model):
             q=re.findall("<DT>(?P<name>.+)\n<B><DD>\t(?P<short_name>.+)\n</B>",html)
             names={}
             for n in q:
-                names[n[0].capitalize()]=n[1].capitalize()
+		name=n[0].capitalize()
+		# It happens often that several journals have the same name and different short_names
+		if name in names.keys():
+		    if names[name]==name: #if the short name is the same as the name, we keep this short name
+			pass
+		    else:
+			names[name]=n[1].capitalize()
 
             if self.name in names.keys():
                 self.short_name=names[self.name]
