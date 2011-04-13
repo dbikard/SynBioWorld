@@ -128,10 +128,11 @@ def parse_ISI_data(data):
 		SO=SO.capitalize()
 		jour, created=Journal.objects.get_or_create(name=SO)
 		if created:
-                    try:
-                        jour.get_name() #finds this abbreviated name of the journal (useful to find which citation matches which paper)
-                    except:
-                        pass
+		    jour.get_name()
+		    #taskqueue.add(url='/librarian/update_journal/',
+                    #             params={'pk': jour.pk},
+                    #             queue_name="journal")
+
 		############# Pub Date ############
 		PM=0
 		if PD:

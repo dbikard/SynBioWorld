@@ -138,18 +138,14 @@ class Journal(models.Model):
             for n in q:
 		name=n[0].capitalize()
 		# It happens often that several journals have the same name and different short_names
-		if name in names.keys():
-		    if names[name]==name: #if the short name is the same as the name, we keep this short name
-			pass
-		    else:
-			names[name]=n[1].capitalize()
+		if name==self.name:
+		    self.short_name=n[1].capitalize()
+		    break
 
-            if self.name in names.keys():
-                self.short_name=names[self.name]
-            else:
-                self.short_name=self.name
-                
-            self.save()
+	    if not self.short_name:
+		self.short_name=self.name
+
+	    self.save()
 
         elif self.short_name and not self.name:
             L=self.short_name[0]
@@ -160,11 +156,11 @@ class Journal(models.Model):
             q=re.findall("<DT>(?P<name>.+)\n<B><DD>\t(?P<short_name>.+)\n</B>",html)
             short_names={}
             for n in q:
-                short_names[n[1].capitalize()]=n[0].capitalize()
+		short_name=n[1].capitalize()
+		if short_name==self.short_name:
+		    self.name=n[0].capitalize()
 
-            if self.short_name in short_names.keys():
-                self.name=short_names[self.short_name]
-            else:
+	    if not self.name: 
                 self.name=self.short_name
                 
             self.save()
