@@ -252,7 +252,7 @@ class Paper(models.Model):
         CR=CR.split(";")
         for cit in CR:
                 cit=cit.strip()
-                taskqueue.add(url='/librarian/update_raw_cit/', params={'pk': self.pk,'raw_cit':cit})
+                taskqueue.add(url='/librarian/update_raw_cit/', params={'pk': self.pk,'raw_cit':cit}, queue_name='citationsUpdate')
 
 class Citation(models.Model):
     citing_paper=models.ForeignKey(Paper, related_name="citing_set")

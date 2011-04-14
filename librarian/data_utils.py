@@ -423,3 +423,28 @@ def corr_jour():
                 print "!!!"+cited_jour.short_name
         
         
+def merge_persons(pk1,pk2):
+    p1=Person.objects.get(pk=pk1)
+    p2=Person.objects.get(pk=pk2)
+    aus2=Authorship.objects.filter(author=p2)
+    for au in aus2:
+        au.author=p1
+        au.save()
+
+    aff2=Affiliation.objects.filter(employee=p2)
+    for aff in aff2:
+        aff.employee=p1
+        aff.save()
+
+    first_au_pap=Paper.objects.filter(first_au=p2)
+    for pap in first_au_pap:
+        pap.first_au=p1
+        pap.save()
+
+    p2.delete()
+    p1.get_SBW()
+    
+
+    
+        
+        
