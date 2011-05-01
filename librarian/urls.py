@@ -25,6 +25,6 @@ urlpatterns = patterns('librarian.views',
     (r'^update_raw_cit/$', 'update_raw_cit'),
     (r'^update_journal/$', 'update_journal'),
     (r'^to_import/$', 'to_import'),
-    (r'^correct_journals/(?P<ran>\d+)/$', 'correct_journals'),
+    #(r'^correct_journals/(?P<ran>\d+)/$', 'correct_journals'),
     #~ (r'^search/$', 'search'),
 )
