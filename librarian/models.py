@@ -233,6 +233,7 @@ class Paper(models.Model):
     sbw=models.IntegerField(null=True)
     raw_citations=models.TextField(max_length=100000,null=True)
     raw_cit=models.ForeignKey(Raw_cit,null=True)
+    added=models.DateField(null=True)
 
     def __unicode__(self):
         return self.title

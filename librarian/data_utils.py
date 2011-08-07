@@ -1,7 +1,7 @@
 from .models import Paper, Person, Journal, Institution, Country, Town, Citation, Authorship, Affiliation, Raw_cit
 from django.core.exceptions import ObjectDoesNotExist
 from google.appengine.api import taskqueue
-import re
+import re, datetime
 
 
 def ISIquery(ran,citedList):
@@ -117,7 +117,7 @@ def parse_ISI_data(data):
 	months={"jan":1,"feb":2,"mar":3,"apr":4,"may":5,"jun":6,"jul":7,"aug":8,"sep":9,"oct":10,"nov":11,"dec":12}
 
 
-	PT,AU,BA,ED,GP,AF,CA,TI,SO,SE,LA,DT,CT,CY,CL,SP,HO,DE,ID,AB,C1,RP,EM,FU,FX,CR,NR,TC,PU,PI,PA,SN,BN,DI,J9,JI,PD,PY,VL,IS,PN,SU,SI,BP,EP,AR,DI2,PG,SC,GA,UT = data
+	PT,AU,BA,ED,GP,AF,CA,TI,SO,SE,LA,DT,CT,CY,CL,SP,HO,DE,ID,AB,C1,RP,EM,FU,FX,CR,NR,TC,Z9,PU,PI,PA,SN,BN,J9,JI,PD,PY,VL,IS,PN,SU,SI,BP,EP,AR,DI,PG,WC,SC,GA,UT,X = data
 	TI=TI.capitalize()
 	
 	query=Paper.objects.filter(title=TI) #Tests if the paper info was already added to the database
@@ -194,7 +194,8 @@ def parse_ISI_data(data):
 				raw_citations=CR,
                                 sbw=0,
 				)
-
+		
+		new_paper.added=datetime.datetime.now()
                 new_paper.save()
 	
 	
