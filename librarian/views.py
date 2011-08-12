@@ -22,9 +22,7 @@ def librarian_home(request):
 	best_journals=map(int,best_journals)
 	query=Paper.objects.filter(journal__in=best_journals,pubYear=datetime.now().year).order_by('-pubMonth')
         top_query=Paper.objects.order_by('-sbw')[:5]
-        best_journals=Journal.objects.order_by('-sbw').values_list('pk',flat=True)[:20]
-	best_journals=map(int,best_journals)
-	recent_query=Paper.objects.filter(journal__in=best_journals,pubYear=datetime.now().year).order_by('-pubMonth')[:5]
+	recent_query=Paper.objects.filter(journal__in=best_journals,pubYear=datetime.now().year).order_by('-added')[:5]
 	return render_to_response('librarian/home.html', {'top': top_query,'recent':recent_query},context_instance=RequestContext(request))
 
 
@@ -323,9 +321,10 @@ def update_raw_cit(request):
                                 cited_jour, created=Journal.objects.get_or_create(short_name=journal.capitalize())
 
                                 if created:
-                                    taskqueue.add(url='/librarian/update_journal/',
-                                              params={'pk': cited_jour.pk},
-                                              queue_name="journal")
+                                        cited_jour.get_name()
+                                    #taskqueue.add(url='/librarian/update_journal/',
+                                              #params={'pk': cited_jour.pk},
+                                              #queue_name="journal")
 
                                 #In case there is some differences between citations of the same paper, we need to find the right one
                                 raw_cit_list=Raw_cit.objects.filter(last_name=last_name,jour=cited_jour,year=year)
